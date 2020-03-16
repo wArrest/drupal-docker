@@ -1,0 +1,32 @@
+version: "3.0"
+services:
+
+  drupal:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    ports:
+      - 9002:80
+      - 9443:443
+    volumes:
+      - /var/www/html/
+      - ./modules:/var/www/html/modules
+      - ./sites:/var/www/html/sites
+      #- ./drupal/profiles:/var/www/html/profiles
+      # this takes advantage of the feature in Docker that a new anonymous
+      # volume (which is what we're creating here) will be initialized with the
+      # existing content of the image at the same location
+    restart: always
+    depends_on:
+      - drupal-db
+
+  drupal-db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
+      MYSQL_USER: default
+      MYSQL_PASSWORD: default
+    restart: always
+    volumes:
+      - /var/lib/mysql
